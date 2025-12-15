@@ -14,7 +14,7 @@
 // 1: 使用 SD 卡中的 .bin 文件 (image.bin)
 // 0: 使用 input_image_packed.h 头文件中的数组
 // ============================================================================
-#define USE_SD_CARD     1
+#define USE_SD_CARD     0
 
 // ============================================================================
 // 通用配置参数
@@ -120,6 +120,7 @@ int main()
     float max_val, sum_exp;
     int predicted_class = -1;
     float max_prob = -1.0f;
+    float classifier_scale = 0.43142056465148926;// 量化比例因子,可以用来调节softmax的平滑度改变输出的置信度
 
     // 1. 初始化平台
     init_platform();
@@ -209,7 +210,7 @@ int main()
     // 第二步：计算指数和
     sum_exp = 0.0f;
     for(i = 0; i < NUM_CLASSES; i++) {
-        probs[i] = expf((float)result_unpacked[i] - max_val);
+        probs[i] = expf(((float)result_unpacked[i] - max_val)*classifier_scale);
         sum_exp += probs[i];
     }
 
